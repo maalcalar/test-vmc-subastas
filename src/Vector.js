@@ -53,6 +53,7 @@ module.exports = class Vector {
             default:
                 break
         }
+        return this
     }
 
     turnRight() {
@@ -72,6 +73,7 @@ module.exports = class Vector {
             default:
                 break
         }
+        return this
     }
 
     turnLeft() {
@@ -91,5 +93,18 @@ module.exports = class Vector {
             default:
                 break
         }
+        return this
+    }
+
+    processSequence(sequence) {
+        const pasos = sequence.split("")
+
+        pasos.forEach((paso) => {
+            if (paso == "A") this.moveForward()
+            else if(paso == "D") this.turnRight()
+            else if(paso == "I") this.turnLeft()
+        })
+
+        return this
     }
 } 

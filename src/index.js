@@ -43,13 +43,7 @@ const readRoute = async () => {
 
                 rutas.forEach(async (ruta, ind, obj) => {
                     if(ind < maxDelivers) {
-                        const pasos = ruta.split("")
-
-                        pasos.forEach((paso) => {
-                            if (paso == "A") vDrone.moveForward()
-                            else if(paso == "D") vDrone.turnRight()
-                            else if(paso == "I") vDrone.turnLeft()
-                        })
+                        vDrone.processSequence(ruta)
     
                         await fh.writeFile(`${vDrone.getReport}${ind < obj.length - 1? "\n" : ""}`, "utf8")
                     } else 
