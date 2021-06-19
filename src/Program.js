@@ -25,6 +25,8 @@ const execute = async (routespath, reportspath, maxBlocks, maxDelivers, qDrones)
             const outFilename = droneRoute.replace("in", "out")
             const fh = await fs.promises.open(path.join(reportspath, outFilename), "w")
 
+            await fh.writeFile("== Reporte de entregas ==\n", "utf8")
+
             if(err) {
                 await fh.writeFile(err.message, "utf8")
             } else {
@@ -34,8 +36,13 @@ const execute = async (routespath, reportspath, maxBlocks, maxDelivers, qDrones)
                 rutas.forEach(async (ruta, ind, obj) => {
                     if(ind < maxDelivers) {
                         vDrone.processSequence(ruta)
+
+                        const report = vDrone.getReport
+                        const direction = report.substr(-2, 1)
+                        const directionWord = direction == "N" ? "Norte" : direction == "S" ? "Sur" : direction == "O" ? "Oeste" : "Este"
+                        const salida = `${report.substr(0, report.length - 4)}) dirección ${directionWord}`
     
-                        await fh.writeFile(`${vDrone.getReport}${ind < obj.length - 1? "\n" : ""}`, "utf8")
+                        await fh.writeFile(`${salida}${ind < obj.length - 1? "\n" : ""}`, "utf8")
                     } else 
                     {
                         await fh.writeFile(`El máximo de entregas es ${maxDelivers}${ind < obj.length - 1? "\n" : ""}`, "utf8")
