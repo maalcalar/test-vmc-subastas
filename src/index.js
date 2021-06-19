@@ -1,5 +1,8 @@
 const routes = process.env.ROUTESPATH || "../routes"
 const reports = process.env.REPORTSPATH || "../reports"
+const maxBlocks = process.env.MAXBLOCKS || 10
+const maxDelivers = process.env.MAXDELIVERS || 3
+const qDrones = 20
 
 const fs = require("fs")
 const path = require("path")
@@ -10,17 +13,22 @@ const routespath = path.join(__dirname, routes)
 const reportspath = path.join(__dirname, reports)
 
 const readRoute = async () => {
-    const regexpFiles = /^in[0-9]{2}.txt$/
+    const regexpFiles = /^in(?!00)[\d]{2}.txt$/
     const droneRoutes = []
 
     const files = await fs.promises.readdir(routespath)
 
-    files.forEach((file) => {
-        regexpFiles.test(file) && droneRoutes.push(file)
+    let countDrones = 0
+
+    files.forEach((file, ind) => {
+        if(parseInt(file.substr(2 ,2)) <= qDrones || countDrones < qDrones) {
+            regexpFiles.test(file) && droneRoutes.push(file)
+            countDrones++
+        }
     })
 
     droneRoutes.forEach((droneRoute) =>{
-        const vDrone = new Vector()
+        const vDrone = new Vector(maxBlocks)
 
         fs.readFile(path.join(routespath, droneRoute), "utf8", async (err, data) => {
             const outFilename = droneRoute.replace("in", "out")
@@ -34,15 +42,21 @@ const readRoute = async () => {
                 const rutas = data.split("\r\n")
 
                 rutas.forEach(async (ruta, ind, obj) => {
-                    const pasos = ruta.split("")
+                    if(ind < maxDelivers) {
+                        const pasos = ruta.split("")
 
-                    pasos.forEach((paso) => {
-                        if (paso == "A") vDrone.moveForward()
-                        else if(paso == "D") vDrone.turnRight()
-                        else if(paso == "I") vDrone.turnLeft()
-                    })
-
-                    await fh.writeFile(`(${vDrone.getState.X}, ${vDrone.getState.Y}, ${vDrone.getState.D})${ind < obj.length - 1? "\n" : ""}`, "utf8")
+                        pasos.forEach((paso) => {
+                            if (paso == "A") vDrone.moveForward()
+                            else if(paso == "D") vDrone.turnRight()
+                            else if(paso == "I") vDrone.turnLeft()
+                        })
+    
+                        await fh.writeFile(`${vDrone.getReport}${ind < obj.length - 1? "\n" : ""}`, "utf8")
+                    } else 
+                    {
+                        await fh.writeFile(`El máximo de entregas es ${maxDelivers}${ind < obj.length - 1? "\n" : ""}`, "utf8")
+                    }
+                    
                 })
 
                 fh.close()

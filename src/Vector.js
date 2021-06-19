@@ -1,8 +1,9 @@
 module.exports = class Vector {
-    constructor() {
+    constructor(max = Infinity) {
         this.X = 0
         this.Y = 0
         this.D = "N" // N: Norte, S: Sur, O: Oeste, E: Este
+        this.max = max
     }
 
     get getState() {
@@ -23,6 +24,15 @@ module.exports = class Vector {
     get getDirection() {
         return {
             D: this.D
+        }
+    }
+
+    get getReport() {
+        const self = this
+        if(this.X > this.max || this.Y > this.max) {
+            return "Se superó el máximo de cuadras"
+        } else {
+            return `(${self.X}, ${self.Y}, ${self.D})`
         }
     }
 
