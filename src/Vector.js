@@ -2,7 +2,7 @@ module.exports = class Vector {
     constructor(max = Infinity) {
         this.X = 0
         this.Y = 0
-        this.D = "N" // N: Norte, S: Sur, O: Oeste, E: Este
+        this.D = "N"
         this.max = max
     }
 
